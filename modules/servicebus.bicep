@@ -1,6 +1,33 @@
 // TODO: add a resource of type Microsoft.ServiceBus/namespaces
 //       - use the 'Basic' service tier
 
+resource serviceBus 'Microsoft.ServiceBus/namespaces@2021-06-01-preview' = {
+  name: 'pergus${uniqueString(resourceGroup().id)}'
+  location: resourceGroup().location
+  sku: {    
+    name: 'Basic'
+    tier: 'Basic'
+  }
+
+  resource authRules 'AuthorizationRules'= {
+    name: 'pergusAuth${uniqueString(resourceGroup().id)}'
+    properties: {
+      rights: [
+        'Manage'
+        'Listen'
+        'Send'
+      ]
+    }
+  }
+
+  resource queue 'queues' = {
+    name: 'thumbnailqueue'
+
+  }
+  
+}
+output connectionString string = serviceBus::authRules.listKeys().primaryConnectionString
+
 // TODO: add a resource of type Microsoft.ServiceBus/namespaces/AuthorizationRules
 //       - make the resource a nested child resource of the servicebus namespace resource
 //       - specify 'Manage', 'Listen', 'Send' rights

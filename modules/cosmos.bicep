@@ -17,7 +17,32 @@ resource cosmosAccount 'Microsoft.DocumentDB/databaseAccounts@2021-06-15' = {
       }
     ]
   }
+
+  resource sqlDatabase 'sqlDatabases' = {
+    name: 'azure101'
+    properties: {
+      resource: {
+        id: 'azure101'
+      }
+    }
+    resource container 'containers' = {
+      name: 'images'
+      properties: {
+        resource: {
+          id: 'images'
+          partitionKey: {
+            kind: 'Hash'
+            paths: [
+              '/id'
+            ]            
+          }
+        }
+      }
+    }
+  }
 }
+
+output cosmosConnectionString string = cosmosAccount.listConnectionStrings().connectionStrings[0].connectionString
 
 // TODO: add a resource of type Microsoft.DocumentDB/databaseAccounts/sqlDatabases
 //       - make the resource a nested child resource of the cosmos db account resource
